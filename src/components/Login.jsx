@@ -60,12 +60,57 @@
 
 // export default Login
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import Header from './Header';
+import { checkValidaDate } from '../utilis/validation';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from '../utilis/firebase';
 
 const Login = () => {
   const [isSignIn, setIsSignIn] = useState(true); // Toggle between Sign In and Sign Up
+  const [error, setError] = useState('');
+  
 
+ const email = useRef(null);
+ const password = useRef(null);
+  const handleButtonClick = () => {
+    //check valid data
+
+console.log(email.current.value);
+console.log(password.current.value)
+
+const message = checkValidaDate(email.current.value, password.current.value);
+setError(message)
+
+if(message) return ;
+  //sign in or sign up
+  if(!isSignIn){
+    //sign up logic 
+    createUserWithEmailAndPassword(auth, email.current.value, password.current.value)
+  .then((userCredential) => { 
+    const user = userCredential.user;
+    console.log(user);
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    setError(errorCode + "" + errorMessage);
+  });
+  } else {
+    //sign in page
+    signInWithEmailAndPassword(auth, email.current.value, password.current.value)
+  .then((userCredential) => {
+    const user = userCredential.user;
+    console.log(user);
+  })
+  .catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    setError(errorCode + "" + errorMessage);
+  });
+  }
+
+  }
   const toggleForm = () => {
     setIsSignIn(!isSignIn);
   };
@@ -87,7 +132,7 @@ const Login = () => {
 
       {/* Centered Form */}
       <div className="flex justify-center items-center min-h-screen z-10">
-        <form className="w-full max-w-md bg-black/60 p-10 rounded-md text-white backdrop-blur-md">
+        <form onSubmit={(e) => e.preventDefault()} className="w-full max-w-md bg-black/60 p-10 rounded-md text-white backdrop-blur-md">
           <h1 className="text-3xl font-bold mb-6">{isSignIn ? 'Sign In' : 'Sign Up'}</h1>
 
           {!isSignIn && (
@@ -99,18 +144,22 @@ const Login = () => {
           )}
 
           <input
+          ref={email}
             type="text"
             placeholder="Email or phone number"
             className="w-full p-3 mb-4 bg-gray-700/80 text-white rounded"
           />
 
           <input
+          ref={password}
             type="password"
             placeholder="Password"
             className="w-full p-3 mb-6 bg-gray-700/80 text-white rounded"
           />
+          <p className='text-red-500 mb-3'>{error}</p>
 
-          <button className="w-full bg-red-700 hover:bg-red-600 text-white py-3 rounded font-semibold">
+          <button className="w-full bg-red-700 hover:bg-red-600 text-white py-3 rounded font-semibold"
+          onClick={handleButtonClick}>
             {isSignIn ? 'Sign In' : 'Sign Up'}
           </button>
 
