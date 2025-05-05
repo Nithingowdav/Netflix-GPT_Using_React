@@ -65,10 +65,12 @@ import Header from './Header';
 import { checkValidaDate } from '../utilis/validation';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from '../utilis/firebase';
+import {  useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [isSignIn, setIsSignIn] = useState(true); // Toggle between Sign In and Sign Up
   const [error, setError] = useState('');
+  const navigate = useNavigate();
   
 
  const email = useRef(null);
@@ -90,6 +92,7 @@ if(message) return ;
   .then((userCredential) => { 
     const user = userCredential.user;
     console.log(user);
+    navigate("/browser")
   })
   .catch((error) => {
     const errorCode = error.code;
@@ -102,6 +105,7 @@ if(message) return ;
   .then((userCredential) => {
     const user = userCredential.user;
     console.log(user);
+    navigate("/browser")
   })
   .catch((error) => {
     const errorCode = error.code;
